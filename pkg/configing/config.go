@@ -17,7 +17,7 @@ const (
 
 	httpServerURL = "http_server_url"
 
-	dbURI     = "db_uri"
+	dbURI = "db_uri"
 )
 
 func init() {
@@ -68,16 +68,15 @@ func NewLoggerConfig() *LoggerConfig {
 
 // ServerConfig grpc server configuration
 type ServerConfig struct {
-	Addr    string
+	Addr string
 }
 
 // NewServerConfig constructor for GRPCConfig
 func NewServerConfig() *ServerConfig {
 	return &ServerConfig{
-		Addr:    cfg.GetString(httpServerURL),
+		Addr: cfg.GetString(httpServerURL),
 	}
 }
-
 
 // DatabaseConfig connection database configuration
 type DatabaseConfig struct {

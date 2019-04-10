@@ -9,8 +9,8 @@ import (
 	"github.com/valyala/fasthttp"
 
 	"github.com/prospik/places_proxy/internal/app/proxy/api"
-	"github.com/prospik/places_proxy/pkg/configing"
-	"github.com/prospik/places_proxy/pkg/logger"
+	config "github.com/prospik/places_proxy/pkg/configing"
+	logging "github.com/prospik/places_proxy/pkg/logger"
 )
 
 func main() {

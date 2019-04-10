@@ -8,7 +8,7 @@ import (
 	"github.com/valyala/fasthttp"
 
 	"github.com/prospik/places_proxy/pkg/conv"
-	"github.com/prospik/places_proxy/pkg/logger"
+	logging "github.com/prospik/places_proxy/pkg/logger"
 )
 
 type route struct {

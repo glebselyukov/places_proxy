@@ -1,5 +1,6 @@
 .idea
 *.iml
+.env
 go.sum
 coverage.out
 coverage.html

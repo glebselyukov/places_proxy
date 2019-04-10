@@ -229,7 +229,7 @@ func (c *sentryCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 			Type:       entry.Message,
 			Stacktrace: stack,
 		}},
-		Level:  raven.DEBUG,
+		Level:  raven.DEBUG, // TODO: prospik: fix convert level from zap to raven and use convertLevelToSeverity func
 		Logger: entry.LoggerName,
 		Tags:   tags,
 	}

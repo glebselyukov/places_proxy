@@ -15,11 +15,7 @@ type httpError struct {
 }
 
 func (e *httpError) MarshalJSON() ([]byte, error) {
-	response, err := json.Marshal(e)
-	if err != nil {
-		return conv.S2B(fmt.Sprintf("{ \"code\": %d, \"message\": \"%s\" }", e.Code, e.Message)), nil
-	}
-	return response, nil
+	return conv.S2B(fmt.Sprintf("{ \"code\": %d, \"message\": \"%s\" }", e.Code, e.Message)), nil
 }
 
 var (

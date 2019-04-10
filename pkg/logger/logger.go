@@ -38,7 +38,7 @@ func New(opts ...Opt) (logger Logger) {
 			log.Fatal(err.Error())
 		}
 		logger = &zapLogger{
-			log: log,
+			log:   log,
 			sugar: sugar,
 		}
 	}()

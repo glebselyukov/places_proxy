@@ -64,7 +64,7 @@ func (l *zapLogger) Info(input interface{}, tags ...*Tag) {
 }
 
 // Infow is sugared logging with output only to stdout
-func (l *zapLogger) Infow(input string, tags ...interface{})  {
+func (l *zapLogger) Infow(input string, tags ...interface{}) {
 	l.sugar.Infow(input, tags...)
 }
 
