@@ -5,7 +5,9 @@ import (
 )
 
 type Places struct {
-	ID string `json:"id"`
+	Slug     string `json:"slug"`
+	Subtitle string `json:"subtitle"`
+	Title    string `json:"title"`
 }
 
 func (p *Places) UnmarshalBinary(data []byte) error {

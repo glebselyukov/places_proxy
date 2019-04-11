@@ -4,12 +4,11 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
-
-	"github.com/valyala/fasthttp"
 
 	"github.com/prospik/places_proxy/internal/app/proxy/api"
 	"github.com/prospik/places_proxy/internal/app/proxy/dal"
+	"github.com/prospik/places_proxy/internal/app/proxy/tcp/client"
+	"github.com/prospik/places_proxy/internal/app/proxy/tcp/server"
 	config "github.com/prospik/places_proxy/pkg/configing"
 	logging "github.com/prospik/places_proxy/pkg/logger"
 )
@@ -50,27 +49,20 @@ func main() {
 		log.Copy(logging.Any("scheme", scheme)).Info("connection to DB is closed")
 	}()
 
-	router := api.NewRouter(log.Copy(logging.Any("module", "proxy_api")))
+	clientCfg := config.NewClientConfig()
+	httpClient := client.NewHTTPClient(clientCfg)
+
+	routerLog := log.Copy(logging.Any("module", "proxy_api"))
+	router := api.NewRouter(routerLog, httpClient)
 	router.RegisterPlacesRoutes()
 
-	server := &fasthttp.Server{
-		Handler:                            router.ServeHTTP,
-		Name:                               "places_proxy",
-		LogAllErrors:                       false,
-		DisableHeaderNamesNormalizing:      true,
-		SleepWhenConcurrencyLimitsExceeded: 0,
-		NoDefaultServerHeader:              true,
-		TCPKeepalive:                       true,
-		ReadTimeout:                        time.Duration(time.Second * 30),
-		WriteTimeout:                       time.Duration(time.Second * 30),
-	}
-
 	serverCfg := config.NewServerConfig()
-	go func(url string) {
-		if err := server.ListenAndServe(url); err != nil {
+	httpServer := server.NewHTTPServer(serverCfg, router.ServeHTTP)
+
+	go func(addr string) {
+		if err := httpServer.ListenAndServe(addr); err != nil {
 			log.Fatal(err)
 		}
-
 	}(serverCfg.Addr)
 
 	log.Infow("http server started", "address", serverCfg.Addr)
@@ -78,7 +70,7 @@ func main() {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, os.Kill, syscall.SIGTERM)
 	<-sig
-	if err := server.Shutdown(); err != nil {
+	if err := httpServer.Shutdown(); err != nil {
 		log.Fatal(err)
 	}
 	log.Infow("http server stopped")
