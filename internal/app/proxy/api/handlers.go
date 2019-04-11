@@ -8,8 +8,6 @@ import (
 
 type placesHandler struct{}
 
-var empty = []byte("{}")
-
 // NewGraphqlHandler constructor for graphqlHandler
 func NewPlacesHandler() Handler {
 	return &placesHandler{}

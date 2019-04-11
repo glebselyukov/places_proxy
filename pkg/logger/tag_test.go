@@ -1,9 +1,10 @@
 package logging
 
 import (
-	"errors"
 	"reflect"
 	"testing"
+
+	"github.com/pkg/errors"
 )
 
 func TestAny(t *testing.T) {

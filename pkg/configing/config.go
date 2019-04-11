@@ -3,7 +3,7 @@ package config
 import (
 	"github.com/spf13/viper"
 
-	"github.com/prospik/places_proxy/pkg/logger"
+	logging "github.com/prospik/places_proxy/pkg/logger"
 )
 
 var cfg *viper.Viper
@@ -40,10 +40,10 @@ func init() {
 	cfg.SetDefault(loggerSentryStacktraceEnabled, true)
 
 	_ = cfg.BindEnv(httpServerURL, "HTTP_SERVER_URL")
-	cfg.SetDefault(httpServerURL, ":40010")
+	cfg.SetDefault(httpServerURL, ":40001")
 
 	_ = cfg.BindEnv(dbURI, "DB_URI")
-	cfg.SetDefault(dbURI, "postgresql://management:123456@localhost:5432/management?sslmode=disable")
+	cfg.SetDefault(dbURI, "redis://proxydefaultpass@127.0.0.1:50005/0")
 }
 
 // LoggerConfig configuration for logger

@@ -6,6 +6,7 @@ import (
 
 type LoggerHandler func(log Logger, err error) (ok bool)
 
+// TODO: implement and use it
 func RegisterHandlers(logger Logger, handlers ...LoggerHandler) (err error) {
 	zapLogger, ok := logger.(*zapLogger)
 	if !ok {
