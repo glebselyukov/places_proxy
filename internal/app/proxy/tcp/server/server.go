@@ -5,7 +5,7 @@ import (
 
 	"github.com/valyala/fasthttp"
 
-	"github.com/prospik/places_proxy/pkg/configing"
+	config "github.com/prospik/places_proxy/pkg/configing"
 )
 
 func NewHTTPServer(cfg *config.ServerConfig, serve fasthttp.RequestHandler) *fasthttp.Server {

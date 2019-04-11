@@ -7,6 +7,7 @@ import (
 
 	"github.com/valyala/fasthttp"
 
+	"github.com/prospik/places_proxy/internal/app/proxy/dal/store"
 	"github.com/prospik/places_proxy/internal/app/proxy/tcp/client"
 	"github.com/prospik/places_proxy/internal/app/proxy/tcp/header"
 	"github.com/prospik/places_proxy/pkg/conv"
@@ -35,23 +36,25 @@ var (
 
 // Router helper tool for request executing
 type Router struct {
-	routes map[string]*route
-	log    logging.Logger
-	client client.Interaction
+	routes  map[string]*route
+	log     logging.Logger
+	client  client.Interaction
+	storage store.Storage
 }
 
 // NewRouter constructor for Router
-func NewRouter(log logging.Logger, client client.Interaction) *Router {
+func NewRouter(log logging.Logger, client client.Interaction, db store.Storage) *Router {
 	return &Router{
-		routes: make(map[string]*route),
-		log:    log,
-		client: client,
+		routes:  make(map[string]*route),
+		log:     log,
+		client:  client,
+		storage: db,
 	}
 }
 
 // RegisterPlacesRoutes registers paths belonging to certain operations.
 func (r *Router) RegisterPlacesRoutes() {
-	places := NewPlacesHandler(r.client)
+	places := NewPlacesHandler(r.client, r.storage)
 	r.Register("/api/places", places, places.Places, GET)
 }
 
@@ -97,6 +100,7 @@ func (r *Router) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	}()
 
 	if ctx.IsOptions() || ctx.IsHead() {
+		r.errorHandler(ctx, methodNotAllowedError)
 		return
 	}
 
@@ -104,20 +108,21 @@ func (r *Router) ServeHTTP(ctx *fasthttp.RequestCtx) {
 	if len(path) > 0 && path[len(path)-1:] == "/" {
 		path = path[:len(path)-1]
 	}
+
 	route, ok := r.routes[path]
 	if !ok {
 		r.errorHandler(ctx, notFoundError)
 		return
 	}
 
-	var isAllowedMethod bool
+	var methodAllowed bool
 	for _, method := range route.methods {
 		if bytes.Equal(ctx.Method(), method) {
-			isAllowedMethod = true
+			methodAllowed = true
 			break
 		}
 	}
-	if !isAllowedMethod {
+	if !methodAllowed {
 		r.errorHandler(ctx, methodNotAllowedError)
 		return
 	}
