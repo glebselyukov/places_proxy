@@ -15,7 +15,14 @@ const (
 	loggerSentryDSN               = "logger_sentry_dsn"
 	loggerSentryStacktraceEnabled = "logger_sentry_stacktrace_enabled"
 
-	httpServerURL = "http_server_url"
+	httpServerURL          = "http_server_url"
+	httpServerName         = "http_server_name"
+	httpServerReadTimeout  = "http_server_read_timeout"
+	httpServerWriteTimeout = "http_server_write_timeout"
+
+	httpClientName         = "http_client_name"
+	httpClientReadTimeout  = "http_client_read_timeout"
+	httpClientWriteTimeout = "http_client_write_timeout"
 
 	dbURI = "db_uri"
 )
@@ -42,6 +49,24 @@ func init() {
 	_ = cfg.BindEnv(httpServerURL, "HTTP_SERVER_URL")
 	cfg.SetDefault(httpServerURL, ":40001")
 
+	_ = cfg.BindEnv(httpServerName, "HTTP_SERVER_NAME")
+	cfg.SetDefault(httpServerName, "places_proxy")
+
+	_ = cfg.BindEnv(httpServerReadTimeout, "HTTP_SERVER_READ_TIMEOUT")
+	cfg.SetDefault(httpServerReadTimeout, 30)
+
+	_ = cfg.BindEnv(httpServerWriteTimeout, "HTTP_SERVER_WRITE_TIMEOUT")
+	cfg.SetDefault(httpServerWriteTimeout, 30)
+
+	_ = cfg.BindEnv(httpClientName, "HTTP_CLIENT_NAME")
+	cfg.SetDefault(httpClientName, "places_proxy")
+
+	_ = cfg.BindEnv(httpClientReadTimeout, "HTTP_CLIENT_READ_TIMEOUT")
+	cfg.SetDefault(httpClientReadTimeout, 30)
+
+	_ = cfg.BindEnv(httpClientWriteTimeout, "HTTP_CLIENT_WRITE_TIMEOUT")
+	cfg.SetDefault(httpClientWriteTimeout, 30)
+
 	_ = cfg.BindEnv(dbURI, "DB_URI")
 	cfg.SetDefault(dbURI, "redis://proxydefaultpass@127.0.0.1:50005/0")
 }
@@ -66,15 +91,37 @@ func NewLoggerConfig() *LoggerConfig {
 	}
 }
 
-// ServerConfig grpc server configuration
+// ServerConfig http server configuration
 type ServerConfig struct {
-	Addr string
+	Addr         string
+	Name         string
+	ReadTimeout  int
+	WriteTimeout int
 }
 
-// NewServerConfig constructor for GRPCConfig
+// NewServerConfig constructor for ServerConfig
 func NewServerConfig() *ServerConfig {
 	return &ServerConfig{
-		Addr: cfg.GetString(httpServerURL),
+		Addr:         cfg.GetString(httpServerURL),
+		Name:         cfg.GetString(httpServerName),
+		ReadTimeout:  cfg.GetInt(httpServerReadTimeout),
+		WriteTimeout: cfg.GetInt(httpServerWriteTimeout),
+	}
+}
+
+// ClientConfig http server configuration
+type ClientConfig struct {
+	Name         string
+	ReadTimeout  int
+	WriteTimeout int
+}
+
+// NewClientConfig constructor for ClientConfig
+func NewClientConfig() *ClientConfig {
+	return &ClientConfig{
+		Name:         cfg.GetString(httpClientName),
+		ReadTimeout:  cfg.GetInt(httpClientReadTimeout),
+		WriteTimeout: cfg.GetInt(httpClientWriteTimeout),
 	}
 }
 
