@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/pkg/errors"
 	"github.com/valyala/fasthttp"
 
 	"github.com/prospik/places_proxy/pkg/conv"
@@ -33,14 +34,26 @@ var (
 	}
 )
 
-func (r *Router) errorHandler(ctx *fasthttp.RequestCtx, e *httpError) {
+func errorRelease(ctx *fasthttp.RequestCtx, e *httpError) (err error) {
 	ctx.Response.SetStatusCode(e.Code)
 	data, err := json.Marshal(e)
 	if err != nil {
-		r.log.Error("can't marshal json")
+		err = errors.New("can't marshal json")
 		return
 	}
 	ctx.SetBody(data)
+	return
+}
+
+func (_ *placesHandler) errorHandler(ctx *fasthttp.RequestCtx, e *httpError) {
+	_ = errorRelease(ctx, e)
+}
+
+func (r *Router) errorHandler(ctx *fasthttp.RequestCtx, e *httpError) {
+	err := errorRelease(ctx, e)
+	if err != nil {
+		r.log.Error(err.Error())
+	}
 }
 
 func (r *Router) internalError(ctx *fasthttp.RequestCtx, err error) {

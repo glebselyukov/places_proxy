@@ -6,21 +6,22 @@ import (
 
 	"github.com/valyala/fasthttp"
 
+	"github.com/prospik/places_proxy/internal/app/proxy/tcp/header"
 	"github.com/prospik/places_proxy/pkg/conv"
 )
 
 var accessControlAllowHeaders = strings.Join([]string{
-	acceptHeader,
-	"Content-Type",
-	"Content-Length",
-	"Accept-Encoding",
-	authorizationHeader,
-	"X-CSRF-Token",
-	requestHeader,
+	header.AcceptHeader,
+	header.ContentType,
+	header.ContentLength,
+	header.AcceptEncoding,
+	header.AuthorizationHeader,
+	header.XCSRFToken,
+	header.RequestHeader,
 }, ", ")
 
 func (r *Router) corsHandler(ctx *fasthttp.RequestCtx) {
-	origin := ctx.Request.Header.Peek(originHeader)
+	origin := ctx.Request.Header.Peek(header.OriginHeader)
 	if origin == nil {
 		return
 	}
@@ -29,7 +30,7 @@ func (r *Router) corsHandler(ctx *fasthttp.RequestCtx) {
 	if ok {
 		allowedMethods = conv.B2S(bytes.Join(route.methods, []byte(", "))) + ", " + allowedMethods
 	}
-	ctx.Response.Header.SetBytesV(accessControlAllowOriginHeader, origin)
-	ctx.Response.Header.Set(accessControlAllowMethods, allowedMethods)
-	ctx.Response.Header.Set(accessControlAllowHeadersHeader, accessControlAllowHeaders)
+	ctx.Response.Header.SetBytesV(header.AccessControlAllowOriginHeader, origin)
+	ctx.Response.Header.Set(header.AccessControlAllowMethods, allowedMethods)
+	ctx.Response.Header.Set(header.AccessControlAllowHeadersHeader, accessControlAllowHeaders)
 }

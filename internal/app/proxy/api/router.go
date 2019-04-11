@@ -7,6 +7,8 @@ import (
 
 	"github.com/valyala/fasthttp"
 
+	"github.com/prospik/places_proxy/internal/app/proxy/tcp/client"
+	"github.com/prospik/places_proxy/internal/app/proxy/tcp/header"
 	"github.com/prospik/places_proxy/pkg/conv"
 	logging "github.com/prospik/places_proxy/pkg/logger"
 )
@@ -35,20 +37,22 @@ var (
 type Router struct {
 	routes map[string]*route
 	log    logging.Logger
+	client client.Interaction
 }
 
 // NewRouter constructor for Router
-func NewRouter(log logging.Logger) *Router {
+func NewRouter(log logging.Logger, client client.Interaction) *Router {
 	return &Router{
 		routes: make(map[string]*route),
 		log:    log,
+		client: client,
 	}
 }
 
 // RegisterPlacesRoutes registers paths belonging to certain operations.
 func (r *Router) RegisterPlacesRoutes() {
-	places := NewPlacesHandler()
-	r.Register("/api/places", places, places.Places, POST)
+	places := NewPlacesHandler(r.client)
+	r.Register("/api/places", places, places.Places, GET)
 }
 
 // Register add new route to routes map
@@ -65,12 +69,15 @@ func (r *Router) Register(path string, handler Handler, handle handleFunc, metho
 
 // ServeHTTP entry point for fasthttp server
 func (r *Router) ServeHTTP(ctx *fasthttp.RequestCtx) {
-	ctx.Response.Header.Set(xContentTypeOptionsHeader, xContentTypeOptionsNosniff)
-	requestID := ctx.Request.Header.Peek(requestHeader)
+	ctx.Response.Header.Set(
+		header.XContentTypeOptionsHeader,
+		header.XContentTypeOptionsNosniff)
+
+	requestID := ctx.Request.Header.Peek(header.RequestHeader)
 	if requestID == nil {
 		requestID = []byte(fmt.Sprintf("%d", ctx.ID()))
 	}
-	ctx.Response.Header.SetBytesV(requestHeader, requestID)
+	ctx.Response.Header.SetBytesV(header.RequestHeader, requestID)
 	headerTags := make([]*logging.Tag, 0, ctx.Request.Header.Len())
 	ctx.Request.Header.VisitAll(func(key, value []byte) {
 		headerTags = append(headerTags, logging.Any(conv.B2S(key), conv.B2S(value)))
@@ -117,13 +124,13 @@ func (r *Router) ServeHTTP(ctx *fasthttp.RequestCtx) {
 
 	route.f(ctx, log)
 
-	acceptContentType := ctx.Request.Header.Peek(acceptHeader)
+	acceptContentType := ctx.Request.Header.Peek(header.AcceptHeader)
 	if acceptContentType != nil && ctx.Response.Header.ContentType() == nil {
 		switch strings.ToLower(conv.B2S(acceptContentType)) {
-		case strings.ToLower(jsonContentType):
-			ctx.Response.Header.SetContentType(jsonContentType)
+		case strings.ToLower(header.JSONContentType):
+			ctx.Response.Header.SetContentType(header.JSONContentType)
 		default:
-			ctx.Response.Header.SetContentType(textContentType)
+			ctx.Response.Header.SetContentType(header.TextContentType)
 		}
 	}
 }
