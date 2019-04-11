@@ -9,6 +9,7 @@ import (
 	"github.com/valyala/fasthttp"
 
 	"github.com/prospik/places_proxy/internal/app/proxy/api"
+	"github.com/prospik/places_proxy/internal/app/proxy/dal"
 	config "github.com/prospik/places_proxy/pkg/configing"
 	logging "github.com/prospik/places_proxy/pkg/logger"
 )
@@ -22,6 +23,32 @@ func main() {
 		logging.SentryDSN(loggerCfg.SentryDSN),
 		logging.SentryStacktraceEnabled(loggerCfg.SentryStacktraceEnabled),
 	)
+
+	dbCfg := config.NewDatabaseConfig()
+	uri := dbCfg.URI
+	db, err := dal.New(uri)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = db.Connect()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	scheme, err := dal.ParseDBScheme(uri)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Copy(logging.Any("scheme", scheme)).Info("connection to DB is opened")
+	defer func() {
+		err = db.Disconnect()
+		if err != nil {
+			log.Error(err)
+		}
+		log.Copy(logging.Any("scheme", scheme)).Info("connection to DB is closed")
+	}()
 
 	router := api.NewRouter(log.Copy(logging.Any("module", "proxy_api")))
 	router.RegisterPlacesRoutes()
@@ -55,5 +82,5 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Infow("http server stopped")
-	log.Infow("proxy shutting down...")
+	log.Infow("proxy shutting down")
 }

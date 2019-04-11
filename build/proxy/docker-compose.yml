@@ -1,0 +1,23 @@
+version: '3.4'
+services:
+  redis:
+    container_name: 'proxy_redis'
+    build:
+      context: .
+      dockerfile: ./redis.Dockerfile
+    volumes:
+      - redis_data:/data
+    ports:
+      - '50005:6379'
+    command: --save 30
+  proxy:
+    container_name: 'proxy_api'
+    build:
+      context: ../..
+      dockerfile: ./build/proxy/proxy.Dockerfile
+    ports:
+      - '40001:40001'
+    depends_on:
+      - redis
+volumes:
+  redis_data:

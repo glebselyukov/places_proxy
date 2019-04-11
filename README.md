@@ -1,11 +1,17 @@
-# Sentry On-Premise
+# Proxy places
 
-## Requirements
+## Some description of how to run a project
+
+Some text
+
+## Sentry
+
+#### Requirements
 
  * Docker 1.10.0+
  * Compose 1.6.0+ _(optional)_
 
-## Up and Running
+#### Up and Running
 
 Command #6 may take some time.
 
