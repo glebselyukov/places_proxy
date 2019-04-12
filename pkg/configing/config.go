@@ -123,7 +123,7 @@ type ClientConfig struct {
 	Endpoint      string
 	ReadTimeout   int
 	WriteTimeout  int
-	UpdateMinutes int
+	UpdateMinutes float64
 }
 
 // NewClientConfig constructor for ClientConfig
@@ -133,7 +133,7 @@ func NewClientConfig() *ClientConfig {
 		Endpoint:      cfg.GetString(httpClientEndpoint),
 		ReadTimeout:   cfg.GetInt(httpClientReadTimeout),
 		WriteTimeout:  cfg.GetInt(httpClientWriteTimeout),
-		UpdateMinutes: cfg.GetInt(httpClientUpdateMinutes),
+		UpdateMinutes: cfg.GetFloat64(httpClientUpdateMinutes),
 	}
 }
 

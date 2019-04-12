@@ -14,17 +14,17 @@ import (
 )
 
 type placesHandler struct {
-	client   client.Interaction
-	storage  store.Storage
-	endpoint string
+	client    client.Interaction
+	storage   store.Storage
+	clientCfg *config.ClientConfig
 }
 
 // NewGraphqlHandler constructor for graphqlHandler
 func NewPlacesHandler(clientCfg *config.ClientConfig, client client.Interaction, storage store.Storage) Handler {
 	return &placesHandler{
-		client:   client,
-		storage:  storage,
-		endpoint: clientCfg.Endpoint,
+		client:    client,
+		storage:   storage,
+		clientCfg: clientCfg,
 	}
 }
 
@@ -34,7 +34,7 @@ func (h *placesHandler) Places(ctx *fasthttp.RequestCtx, log logging.Logger) {
 	ctx.Response.SetStatusCode(fasthttp.StatusOK)
 
 	fetch := h.client.Fetch
-	url := fmt.Sprintf("%s?%s", h.endpoint, queryArgs(ctx))
+	url := fmt.Sprintf("%s?%s", h.clientCfg.Endpoint, queryArgs(ctx))
 
 	key := prepareKey(ctx)
 	{
@@ -45,7 +45,8 @@ func (h *placesHandler) Places(ctx *fasthttp.RequestCtx, log logging.Logger) {
 				ctx.SetBody(cached.Data)
 
 				t, _ := time.Parse(layoutRFC3339, cached.Time)
-				if time.Since(t).Seconds() > 30 {
+				fmt.Println(time.Since(t).Minutes())
+				if time.Since(t).Minutes() > h.clientCfg.UpdateMinutes {
 
 					go func(m []byte, u string) {
 						response, err := fetch(m, u)
