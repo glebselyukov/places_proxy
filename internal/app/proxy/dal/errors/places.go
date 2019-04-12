@@ -4,9 +4,9 @@ import (
 	"github.com/pkg/errors"
 )
 
-// errors database for places operations
+// dal errors for places transactions
 var (
 	ErrPlacesInternal = errors.New("internal error")
-	ErrPlacesNotFound = errors.New("key not found")
-	ErrPlacesExists   = errors.New("key exists")
+	//ErrPlacesNotFound = errors.New("key not found")
+	//ErrPlacesExists   = errors.New("key exists")
 )

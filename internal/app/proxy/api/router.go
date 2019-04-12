@@ -10,6 +10,7 @@ import (
 	"github.com/prospik/places_proxy/internal/app/proxy/dal/store"
 	"github.com/prospik/places_proxy/internal/app/proxy/tcp/client"
 	"github.com/prospik/places_proxy/internal/app/proxy/tcp/header"
+	config "github.com/prospik/places_proxy/pkg/configing"
 	"github.com/prospik/places_proxy/pkg/conv"
 	logging "github.com/prospik/places_proxy/pkg/logger"
 )
@@ -37,15 +38,17 @@ var (
 // Router helper tool for request executing
 type Router struct {
 	routes  map[string]*route
+	config  *config.ClientConfig
 	log     logging.Logger
 	client  client.Interaction
 	storage store.Storage
 }
 
 // NewRouter constructor for Router
-func NewRouter(log logging.Logger, client client.Interaction, db store.Storage) *Router {
+func NewRouter(clientCfg *config.ClientConfig, log logging.Logger, client client.Interaction, db store.Storage) *Router {
 	return &Router{
 		routes:  make(map[string]*route),
+		config:  clientCfg,
 		log:     log,
 		client:  client,
 		storage: db,
@@ -54,7 +57,7 @@ func NewRouter(log logging.Logger, client client.Interaction, db store.Storage) 
 
 // RegisterPlacesRoutes registers paths belonging to certain operations.
 func (r *Router) RegisterPlacesRoutes() {
-	places := NewPlacesHandler(r.client, r.storage)
+	places := NewPlacesHandler(r.config, r.client, r.storage)
 	r.Register("/api/places", places, places.Places, GET)
 }
 

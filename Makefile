@@ -39,10 +39,6 @@ format:
 	go fmt `go list ./... | grep -v /vendor/`
 	goimports -w -local ${MODULE_NAME} `go list -f {{.Dir}} ./...`
 
-# LINTER
-linter: format
-	gometalinter ./...
-
 # PREPARE
 prepare:
 	go mod download

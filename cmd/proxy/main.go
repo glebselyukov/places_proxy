@@ -53,7 +53,7 @@ func main() {
 	httpClient := client.NewHTTPClient(clientCfg)
 
 	routerLog := log.Copy(logging.Any("module", "proxy_api"))
-	router := api.NewRouter(routerLog, httpClient, db)
+	router := api.NewRouter(clientCfg, routerLog, httpClient, db)
 	router.RegisterPlacesRoutes()
 
 	serverCfg := config.NewServerConfig()
