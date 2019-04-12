@@ -1,15 +1,35 @@
 # Proxy places
 
-## Some description of how to run a project
+- [Proxy server](#project)
+- [Sentry](#sentry)
 
-Some text
+---
+
+## Project
+
+#### Requirements
+
+ * Golang 1.12+ _(optional 1.11.5+ for new go modules)_
+ * Docker 1.10.0+
+ * Docker Compose 1.6.0+ _(optional)_
+ * Unix-like system (OS X | Linux) _(assuming you want to use the Makefile)_
+ * [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) for `make format` cmd
+ 
+ ...
+ 
+ Some text
+ 
+ ...
+
+---
 
 ## Sentry
 
 #### Requirements
 
  * Docker 1.10.0+
- * Compose 1.6.0+ _(optional)_
+ * Docker Compose 1.6.0+ _(optional)_
+ * Unix-like system (OS X | Linux) _(assuming you want to use the Makefile)_
 
 #### Up and Running
 
