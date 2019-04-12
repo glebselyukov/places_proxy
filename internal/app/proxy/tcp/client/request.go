@@ -26,18 +26,32 @@ func (_ *fastHTTPClient) Request(method []byte, url string, opts ...RequestOpt) 
 	return
 }
 
-func (f *fastHTTPClient) Do(request *fasthttp.Request, opts ...DoOpt) (response *fasthttp.Response, err error) {
+func (f *fastHTTPClient) DoTimeout(request *fasthttp.Request, opts ...DoOpt) (response *fasthttp.Response, err error) {
 	response = fasthttp.AcquireResponse()
 	t := f.defaultDoTimeout
 	for _, opt := range opts {
 		t = opt()
 	}
 
+	// TODO: Gleb Selyukov - contribute and fix fasthttp package with DoTimeout
 	err = f.client.DoTimeout(request, response, t)
 	if err != nil {
 		err = errors.WithStack(err)
 		return
 	}
+
+	return
+}
+
+func (f *fastHTTPClient) Do(request *fasthttp.Request, opts ...DoOpt) (response *fasthttp.Response, err error) {
+	response = fasthttp.AcquireResponse()
+
+	err = f.client.Do(request, response)
+	if err != nil {
+		err = errors.WithStack(err)
+		return
+	}
+
 	return
 }
 

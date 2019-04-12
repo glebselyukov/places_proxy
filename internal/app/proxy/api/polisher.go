@@ -15,7 +15,7 @@ import (
 
 const layoutRFC3339 = "2006-01-02T15:04:05.999999999Z07:00"
 
-func (h *placesHandler) placesPolisher(res *fasthttp.Response, key string) error {
+func (h *placesHandler) placesPolisher(res *fasthttp.Response, key string) ([]byte, error) {
 	body := res.Body()
 
 	checksum := xxhash.New64()
@@ -24,12 +24,17 @@ func (h *placesHandler) placesPolisher(res *fasthttp.Response, key string) error
 
 	data := make([]dao.Types, 0)
 	if err := json.Unmarshal(body, &data); err != nil {
-		return errors.WithStack(err)
+		return []byte{}, err
 	}
 
 	places := dao.ExtractTypes(data)
 	h.storage.SavePlaces(context.Background(), key, checksum.Sum64(), places)
+	b, err := json.Marshal(places)
+	if err != nil {
+		err = errors.WithStack(err)
+		return b, err
+	}
 
 	fasthttp.ReleaseResponse(res)
-	return nil
+	return b, err
 }
