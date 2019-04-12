@@ -42,7 +42,7 @@ func (db *redisDatabase) GetPlaces(ctx context.Context, key string) (*dao.Result
 		return result, err
 	}
 
-	bytes, err := json.Marshal(places)
+	bytes, err := json.Marshal(places.Data)
 	if err != nil {
 		return result, err
 	}

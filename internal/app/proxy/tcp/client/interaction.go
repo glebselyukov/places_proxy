@@ -15,6 +15,7 @@ type Interaction interface {
 
 type Interacting interface {
 	Request(method []byte, url string, opts ...RequestOpt) (request *fasthttp.Request)
+	DoTimeout(request *fasthttp.Request, opts ...DoOpt) (response *fasthttp.Response, err error)
 	Do(request *fasthttp.Request, opts ...DoOpt) (response *fasthttp.Response, err error)
 }
 
