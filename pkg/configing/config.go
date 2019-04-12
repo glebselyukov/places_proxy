@@ -20,9 +20,11 @@ const (
 	httpServerReadTimeout  = "http_server_read_timeout"
 	httpServerWriteTimeout = "http_server_write_timeout"
 
-	httpClientName         = "http_client_name"
-	httpClientReadTimeout  = "http_client_read_timeout"
-	httpClientWriteTimeout = "http_client_write_timeout"
+	httpClientName          = "http_client_name"
+	httpClientReadTimeout   = "http_client_read_timeout"
+	httpClientWriteTimeout  = "http_client_write_timeout"
+	httpClientUpdateMinutes = "http_client_update_minutes"
+	httpClientEndpoint      = "http_client_endpoint"
 
 	dbURI = "db_uri"
 )
@@ -66,6 +68,12 @@ func init() {
 
 	_ = cfg.BindEnv(httpClientWriteTimeout, "HTTP_CLIENT_WRITE_TIMEOUT")
 	cfg.SetDefault(httpClientWriteTimeout, 30)
+
+	_ = cfg.BindEnv(httpClientUpdateMinutes, "HTTP_CLIENT_UPDATE_MINUTES")
+	cfg.SetDefault(httpClientUpdateMinutes, 10)
+
+	_ = cfg.BindEnv(httpClientEndpoint, "HTTP_CLIENT_ENDPOINT")
+	cfg.SetDefault(httpClientEndpoint, "https://places.aviasales.ru/v2/places.json")
 
 	_ = cfg.BindEnv(dbURI, "DB_URI")
 	cfg.SetDefault(dbURI, "redis://proxydefaultpass@127.0.0.1:50005/0")
@@ -111,17 +119,21 @@ func NewServerConfig() *ServerConfig {
 
 // ClientConfig http server configuration
 type ClientConfig struct {
-	Name         string
-	ReadTimeout  int
-	WriteTimeout int
+	Name          string
+	Endpoint      string
+	ReadTimeout   int
+	WriteTimeout  int
+	UpdateMinutes int
 }
 
 // NewClientConfig constructor for ClientConfig
 func NewClientConfig() *ClientConfig {
 	return &ClientConfig{
-		Name:         cfg.GetString(httpClientName),
-		ReadTimeout:  cfg.GetInt(httpClientReadTimeout),
-		WriteTimeout: cfg.GetInt(httpClientWriteTimeout),
+		Name:          cfg.GetString(httpClientName),
+		Endpoint:      cfg.GetString(httpClientEndpoint),
+		ReadTimeout:   cfg.GetInt(httpClientReadTimeout),
+		WriteTimeout:  cfg.GetInt(httpClientWriteTimeout),
+		UpdateMinutes: cfg.GetInt(httpClientUpdateMinutes),
 	}
 }
 
