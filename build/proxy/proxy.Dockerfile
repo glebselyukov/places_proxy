@@ -13,6 +13,7 @@ RUN go mod download
 RUN go build -o /src/bin/$APP_NAME ./cmd/$APP_NAME/main.go
 
 FROM alpine:3.9
+RUN apk add --update --no-cache ca-certificates
 ARG APP_NAME
 COPY --from=builder /src/bin/$APP_NAME /usr/local/bin/$APP_NAME
 ENV APP=$APP_NAME

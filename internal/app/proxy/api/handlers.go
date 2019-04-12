@@ -45,7 +45,6 @@ func (h *placesHandler) Places(ctx *fasthttp.RequestCtx, log logging.Logger) {
 				ctx.SetBody(cached.Data)
 
 				t, _ := time.Parse(layoutRFC3339, cached.Time)
-				fmt.Println(time.Since(t).Minutes())
 				if time.Since(t).Minutes() > h.clientCfg.UpdateMinutes {
 
 					go func(m []byte, u string) {
@@ -54,7 +53,7 @@ func (h *placesHandler) Places(ctx *fasthttp.RequestCtx, log logging.Logger) {
 							return
 						}
 
-						_ = h.placesPolisher(response, key)
+						_, _ = h.placesPolisher(response, key)
 
 					}(GET, url)
 
@@ -72,11 +71,11 @@ func (h *placesHandler) Places(ctx *fasthttp.RequestCtx, log logging.Logger) {
 	}
 	defer fasthttp.ReleaseResponse(response)
 
-	err = h.placesPolisher(response, key)
+	body, err := h.placesPolisher(response, key)
 	if err != nil {
 		h.errorHandler(ctx, internalError)
 		return
 	}
 
-	ctx.SetBody(ctx.Request.Body())
+	ctx.SetBody(body)
 }
