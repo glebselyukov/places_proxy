@@ -30,7 +30,6 @@ This service provides information for cities, airports and countries based on on
  * Docker Compose 1.6.0+ _(optional)_
  * Unix-like system (OS X | Linux) _(assuming you want to use the Makefile)_
  * [goimports](https://godoc.org/golang.org/x/tools/cmd/goimports) for `make format` cmd
- 
 
 ### Environment variables
 
