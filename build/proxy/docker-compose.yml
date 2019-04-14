@@ -4,7 +4,7 @@ services:
     container_name: 'proxy_redis'
     build:
       context: .
-      dockerfile: ./redis.Dockerfile
+      dockerfile: redis.Dockerfile
     volumes:
       - redis_data:/data
     ports:
@@ -12,9 +12,13 @@ services:
     command: --save 30
   proxy:
     container_name: 'proxy_api'
+    links:
+      - redis:redis
+    env_file:
+      - config/proxy.env
     build:
       context: ../..
-      dockerfile: ./build/proxy/proxy.Dockerfile
+      dockerfile: build/proxy/proxy.Dockerfile
     ports:
       - '40001:40001'
     depends_on:

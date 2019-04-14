@@ -43,7 +43,7 @@ func init() {
 	cfg.SetDefault(loggerSentryLevel, "error")
 
 	_ = cfg.BindEnv(loggerSentryDSN, "LOGGER_SENTRY_DSN")
-	cfg.SetDefault(loggerSentryDSN, "http://6a21d946805249c1b58dd3037e842a8d@localhost:9000/1")
+	cfg.SetDefault(loggerSentryDSN, "")
 
 	_ = cfg.BindEnv(loggerSentryStacktraceEnabled, "LOGGER_SENTRY_STACKTRACE_ENABLED")
 	cfg.SetDefault(loggerSentryStacktraceEnabled, true)
@@ -123,7 +123,7 @@ type ClientConfig struct {
 	Endpoint      string
 	ReadTimeout   int
 	WriteTimeout  int
-	UpdateMinutes int
+	UpdateMinutes float64
 }
 
 // NewClientConfig constructor for ClientConfig
@@ -133,7 +133,7 @@ func NewClientConfig() *ClientConfig {
 		Endpoint:      cfg.GetString(httpClientEndpoint),
 		ReadTimeout:   cfg.GetInt(httpClientReadTimeout),
 		WriteTimeout:  cfg.GetInt(httpClientWriteTimeout),
-		UpdateMinutes: cfg.GetInt(httpClientUpdateMinutes),
+		UpdateMinutes: cfg.GetFloat64(httpClientUpdateMinutes),
 	}
 }
 
